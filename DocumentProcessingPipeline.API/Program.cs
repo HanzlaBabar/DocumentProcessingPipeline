@@ -13,6 +13,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddSingleton<IProcessingQueue, InMemoryProcessingQueue>();
+builder.Services.AddHostedService<DocumentProcessingWorker>();
 
 builder.Services.AddSingleton<MongoDbContext>(sp =>
 {

@@ -8,10 +8,12 @@ namespace DocumentProcessingPipeline.Infrastructure.Services
     public class DocumentService : IDocumentService
     {
         private readonly IDocumentRepository _repository;
+        private readonly IProcessingQueue _queue;
 
-        public DocumentService(IDocumentRepository repository)
+        public DocumentService(IDocumentRepository repository, IProcessingQueue queue)
         {
             _repository = repository;
+            _queue = queue;
         }
 
         public async Task<Document> UploadAsync(string fileName, string filePath)
@@ -24,6 +26,9 @@ namespace DocumentProcessingPipeline.Infrastructure.Services
             };
 
             await _repository.CreateAsync(document);
+
+            //trigger async processing
+            _queue.Enqueue(document.Id);
 
             return document;
         }

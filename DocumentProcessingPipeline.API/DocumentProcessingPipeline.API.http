@@ -1,0 +1,6 @@
+@DocumentProcessingPipeline.API_HostAddress = http://localhost:5271
+
+GET {{DocumentProcessingPipeline.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

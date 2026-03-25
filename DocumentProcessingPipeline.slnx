@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="DocumentProcessingPipeline.API/DocumentProcessingPipeline.API.csproj" />
+  <Project Path="DocumentProcessingPipeline.Core/DocumentProcessingPipeline.Core.csproj" />
+  <Project Path="DocumentProcessingPipeline.Infrastructure/DocumentProcessingPipeline.Infrastructure.csproj" />
+</Solution>

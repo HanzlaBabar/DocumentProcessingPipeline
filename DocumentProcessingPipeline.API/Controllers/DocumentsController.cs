@@ -33,5 +33,12 @@ namespace DocumentProcessingPipeline.API.Controllers
 
             return Ok(document);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var documents = await _service.GetAllAsync();
+            return Ok(documents);
+        }
     }
 }

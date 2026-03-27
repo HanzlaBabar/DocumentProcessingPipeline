@@ -1,4 +1,5 @@
 using DocumentProcessingPipeline.Core.Interfaces;
+using DocumentProcessingPipeline.Infrastructure.OCR;
 using DocumentProcessingPipeline.Infrastructure.Persistence;
 using DocumentProcessingPipeline.Infrastructure.Services;
 
@@ -13,8 +14,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
-builder.Services.AddSingleton<IProcessingQueue, InMemoryProcessingQueue>();
-builder.Services.AddHostedService<DocumentProcessingWorker>();
+//builder.Services.AddSingleton<IProcessingQueue, InMemoryProcessingQueue>();
+//builder.Services.AddHostedService<DocumentProcessingWorker>();
+builder.Services.AddScoped<OcrService>();
+builder.Services.AddScoped<ITagDetectionService, TagDetectionService>();
 
 builder.Services.AddSingleton<MongoDbContext>(sp =>
 {

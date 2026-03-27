@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,5 +21,11 @@
     <ProjectReference Include="..\DocumentProcessingPipeline.Core\DocumentProcessingPipeline.Core.csproj" />
     <ProjectReference Include="..\DocumentProcessingPipeline.Infrastructure\DocumentProcessingPipeline.Infrastructure.csproj" />
   </ItemGroup>
+
+    <ItemGroup>
+		<Content Include="tessdata\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 </Project>

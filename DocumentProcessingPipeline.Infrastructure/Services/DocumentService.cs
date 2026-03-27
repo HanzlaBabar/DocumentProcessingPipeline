@@ -1,36 +1,55 @@
-﻿
-using DocumentProcessingPipeline.Core.Entities;
+﻿using DocumentProcessingPipeline.Core.Entities;
 using DocumentProcessingPipeline.Core.Enums;
 using DocumentProcessingPipeline.Core.Interfaces;
+using DocumentProcessingPipeline.Infrastructure.OCR;
 
-namespace DocumentProcessingPipeline.Infrastructure.Services
+public class DocumentService : IDocumentService
 {
-    public class DocumentService : IDocumentService
+    private readonly IDocumentRepository _repository;
+    private readonly OcrService _ocrService;
+    private readonly ITagDetectionService _tagService;
+
+    public DocumentService(
+        IDocumentRepository repository,
+        OcrService ocrService,
+        ITagDetectionService tagService)
     {
-        private readonly IDocumentRepository _repository;
-        private readonly IProcessingQueue _queue;
+        _repository = repository;
+        _ocrService = ocrService;
+        _tagService = tagService;
+    }
 
-        public DocumentService(IDocumentRepository repository, IProcessingQueue queue)
+    public async Task<Document> UploadAndProcessAsync(string fileName, string filePath)
+    {
+        var document = new Document
         {
-            _repository = repository;
-            _queue = queue;
+            FileName = fileName,
+            FilePath = filePath,
+            Status = DocumentStatus.Processing
+        };
+
+        await _repository.CreateAsync(document);
+
+        try
+        {
+            // OCR
+            var text = _ocrService.ExtractText(filePath);
+
+            Console.WriteLine($"OCR TEXT:\n{text}");
+
+            // Tag detection
+            var tags = _tagService.DetectTags(text);
+
+            document.Tags = tags;
+            document.Status = DocumentStatus.Completed;
+        }
+        catch
+        {
+            document.Status = DocumentStatus.Failed;
         }
 
-        public async Task<Document> UploadAsync(string fileName, string filePath)
-        {
-            var document = new Document
-            {
-                FileName = fileName,
-                FilePath = filePath,
-                Status = DocumentStatus.Uploaded
-            };
+        await _repository.UpdateAsync(document);
 
-            await _repository.CreateAsync(document);
-
-            //trigger async processing
-            _queue.Enqueue(document.Id);
-
-            return document;
-        }
+        return document;
     }
 }

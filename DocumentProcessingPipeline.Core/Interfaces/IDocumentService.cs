@@ -4,6 +4,6 @@ namespace DocumentProcessingPipeline.Core.Interfaces
 {
     public interface IDocumentService
     {
-        Task<Document> UploadAsync(string fileName, string filePath);
+        Task<Document> UploadAndProcessAsync(string fileName, string filePath);
     }
 }

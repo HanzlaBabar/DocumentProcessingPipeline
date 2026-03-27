@@ -1,5 +1,6 @@
 ﻿using DocumentProcessingPipeline.Core.Enums;
 using DocumentProcessingPipeline.Core.Interfaces;
+using DocumentProcessingPipeline.Infrastructure.OCR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -34,6 +35,8 @@ namespace DocumentProcessingPipeline.Infrastructure.Services
             using var scope = _scopeFactory.CreateScope();
 
             var repository = scope.ServiceProvider.GetRequiredService<IDocumentRepository>();
+            var ocrService = scope.ServiceProvider.GetRequiredService<OcrService>();
+            var tagService = scope.ServiceProvider.GetRequiredService<ITagDetectionService>();
 
             var document = await repository.GetByIdAsync(documentId);
 
@@ -44,17 +47,14 @@ namespace DocumentProcessingPipeline.Infrastructure.Services
                 document.Status = DocumentStatus.Processing;
                 await repository.UpdateAsync(document);
 
-                await Task.Delay(3000); // simulate processing
+                //OCR
+                var text = ocrService.ExtractText(document.FileName);
 
-                // fake tags
-                document.Tags.Add(new()
-                {
-                    Label = "VALVE-101",
-                    Type = "Valve",
-                    X = 100,
-                    Y = 200
-                });
 
+                // tag detection
+                var tags = tagService.DetectTags(text);
+
+                document.Tags = tags;
                 document.Status = DocumentStatus.Completed;
 
                 await repository.UpdateAsync(document);

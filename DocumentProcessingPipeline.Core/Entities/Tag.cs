@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DocumentProcessingPipeline.Core.Enums;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace DocumentProcessingPipeline.Core.Entities
 {
@@ -10,10 +8,7 @@ namespace DocumentProcessingPipeline.Core.Entities
     {
         public string Label { get; set; }
 
-        public string Type { get; set; }
-
-        public int X { get; set; }
-
-        public int Y { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public TagType Type { get; set; }
     }
 }

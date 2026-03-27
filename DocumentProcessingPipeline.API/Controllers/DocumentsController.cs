@@ -17,10 +17,8 @@ namespace DocumentProcessingPipeline.API.Controllers
         [HttpPost("upload")]
         public async Task<IActionResult> Upload(IFormFile file)
         {
-            if(file == null || file.Length == 0)
-            {
+            if (file == null || file.Length == 0)
                 return BadRequest("File is empty");
-            }
 
             var filePath = Path.Combine("uploads", file.FileName);
 
@@ -31,7 +29,7 @@ namespace DocumentProcessingPipeline.API.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            var document = await _service.UploadAsync(file.FileName, filePath);
+            var document = await _service.UploadAndProcessAsync(file.FileName, filePath);
 
             return Ok(document);
         }

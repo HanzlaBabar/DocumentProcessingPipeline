@@ -3,53 +3,62 @@ using DocumentProcessingPipeline.Core.Enums;
 using DocumentProcessingPipeline.Core.Interfaces;
 using DocumentProcessingPipeline.Infrastructure.OCR;
 
-public class DocumentService : IDocumentService
+namespace DocumentProcessingPipeline.Infrastructure.Services
 {
-    private readonly IDocumentRepository _repository;
-    private readonly OcrService _ocrService;
-    private readonly ITagDetectionService _tagService;
-
-    public DocumentService(
-        IDocumentRepository repository,
-        OcrService ocrService,
-        ITagDetectionService tagService)
+    public class DocumentService : IDocumentService
     {
-        _repository = repository;
-        _ocrService = ocrService;
-        _tagService = tagService;
-    }
+        private readonly IDocumentRepository _repository;
+        private readonly OcrService _ocrService;
+        private readonly ITagDetectionService _tagService;
 
-    public async Task<Document> UploadAndProcessAsync(string fileName, string filePath)
-    {
-        var document = new Document
+        public DocumentService(
+            IDocumentRepository repository,
+            OcrService ocrService,
+            ITagDetectionService tagService)
         {
-            FileName = fileName,
-            FilePath = filePath,
-            Status = DocumentStatus.Processing
-        };
-
-        await _repository.CreateAsync(document);
-
-        try
-        {
-            // OCR
-            var text = _ocrService.ExtractText(filePath);
-
-            Console.WriteLine($"OCR TEXT:\n{text}");
-
-            // Tag detection
-            var tags = _tagService.DetectTags(text);
-
-            document.Tags = tags;
-            document.Status = DocumentStatus.Completed;
-        }
-        catch
-        {
-            document.Status = DocumentStatus.Failed;
+            _repository = repository;
+            _ocrService = ocrService;
+            _tagService = tagService;
         }
 
-        await _repository.UpdateAsync(document);
+        public async Task<Document> UploadAndProcessAsync(string fileName, string filePath)
+        {
+            var document = new Document
+            {
+                FileName = fileName,
+                FilePath = filePath,
+                Status = DocumentStatus.Processing
+            };
 
-        return document;
+            await _repository.CreateAsync(document);
+
+            try
+            {
+                // OCR
+                var text = _ocrService.ExtractText(filePath);
+
+                Console.WriteLine($"OCR TEXT:\n{text}");
+
+                // Tag detection
+                var tags = _tagService.DetectTags(text);
+
+                document.Tags = tags;
+                document.Status = DocumentStatus.Completed;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to process document '{fileName}': {ex}");
+                document.Status = DocumentStatus.Failed;
+            }
+
+            await _repository.UpdateAsync(document);
+
+            return document;
+        }
+
+        public async Task<List<Document>> GetAllAsync()
+        {
+            return await _repository.GetAllAsync();
+        }
     }
 }

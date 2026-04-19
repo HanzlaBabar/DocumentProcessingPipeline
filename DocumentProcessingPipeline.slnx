@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="DocumentProcessingPipeline.API/DocumentProcessingPipeline.API.csproj" />
+  <Project Path="DocumentProcessingPipeline.Application/DocumentProcessingPipeline.Application.csproj" Id="3eb3c284-d8cc-4639-a9f5-6e35c0950cae" />
   <Project Path="DocumentProcessingPipeline.Core/DocumentProcessingPipeline.Core.csproj" />
   <Project Path="DocumentProcessingPipeline.Infrastructure/DocumentProcessingPipeline.Infrastructure.csproj" />
+  <Project Path="DocumentProcessingPipeline.Tests/DocumentProcessingPipeline.Tests.csproj" Id="4b9ab1c3-78e6-4417-8e79-030dcfff8b16" />
 </Solution>

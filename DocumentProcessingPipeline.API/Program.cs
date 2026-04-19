@@ -1,6 +1,8 @@
-using DocumentProcessingPipeline.Core.Interfaces;
-using DocumentProcessingPipeline.Infrastructure.OCR;
+using DocumentProcessingPipeline.Application.Interfaces;
+using DocumentProcessingPipeline.Application.OCR;
+using DocumentProcessingPipeline.Application.Services;
 using DocumentProcessingPipeline.Infrastructure.Persistence;
+using DocumentProcessingPipeline.Infrastructure.Repositories;
 using DocumentProcessingPipeline.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,14 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
-//builder.Services.AddSingleton<IProcessingQueue, InMemoryProcessingQueue>();
-//builder.Services.AddHostedService<DocumentProcessingWorker>();
 builder.Services.AddScoped<OcrService>();
 builder.Services.AddScoped<ITagDetectionService, TagDetectionService>();
 

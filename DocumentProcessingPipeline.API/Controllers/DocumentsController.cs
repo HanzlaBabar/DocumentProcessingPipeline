@@ -1,4 +1,4 @@
-﻿using DocumentProcessingPipeline.Core.Interfaces;
+﻿using DocumentProcessingPipeline.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DocumentProcessingPipeline.API.Controllers

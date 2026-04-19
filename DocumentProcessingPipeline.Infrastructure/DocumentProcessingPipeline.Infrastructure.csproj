@@ -7,11 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DocumentProcessingPipeline.Application\DocumentProcessingPipeline.Application.csproj" />
     <ProjectReference Include="..\DocumentProcessingPipeline.Core\DocumentProcessingPipeline.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Storage\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
-﻿using DocumentProcessingPipeline.Core.Entities;
+﻿using DocumentProcessingPipeline.Application.Interfaces;
+using DocumentProcessingPipeline.Core.Entities;
 using DocumentProcessingPipeline.Core.Enums;
-using DocumentProcessingPipeline.Core.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace DocumentProcessingPipeline.Infrastructure.Services

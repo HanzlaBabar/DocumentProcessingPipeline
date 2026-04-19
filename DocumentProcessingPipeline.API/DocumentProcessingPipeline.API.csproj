@@ -12,13 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Responses\" />
-    <Folder Include="Requests\" />
     <Folder Include="uploads\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DocumentProcessingPipeline.Core\DocumentProcessingPipeline.Core.csproj" />
+    <ProjectReference Include="..\DocumentProcessingPipeline.Application\DocumentProcessingPipeline.Application.csproj" />
     <ProjectReference Include="..\DocumentProcessingPipeline.Infrastructure\DocumentProcessingPipeline.Infrastructure.csproj" />
   </ItemGroup>
 

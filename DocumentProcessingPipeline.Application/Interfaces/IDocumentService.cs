@@ -1,6 +1,6 @@
 ﻿using DocumentProcessingPipeline.Core.Entities;
 
-namespace DocumentProcessingPipeline.Core.Interfaces
+namespace DocumentProcessingPipeline.Application.Interfaces
 {
     public interface IDocumentService
     {

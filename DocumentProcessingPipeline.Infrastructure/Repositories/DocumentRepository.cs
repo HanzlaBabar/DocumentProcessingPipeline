@@ -1,8 +1,9 @@
-﻿using DocumentProcessingPipeline.Core.Entities;
-using DocumentProcessingPipeline.Core.Interfaces;
+﻿using DocumentProcessingPipeline.Application.Interfaces;
+using DocumentProcessingPipeline.Core.Entities;
+using DocumentProcessingPipeline.Infrastructure.Persistence;
 using MongoDB.Driver;
 
-namespace DocumentProcessingPipeline.Infrastructure.Persistence
+namespace DocumentProcessingPipeline.Infrastructure.Repositories
 {
     public class DocumentRepository : IDocumentRepository
     {

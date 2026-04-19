@@ -1,6 +1,6 @@
 ﻿using Tesseract;
 
-namespace DocumentProcessingPipeline.Infrastructure.OCR
+namespace DocumentProcessingPipeline.Application.OCR
 {
     public class OcrService
     {

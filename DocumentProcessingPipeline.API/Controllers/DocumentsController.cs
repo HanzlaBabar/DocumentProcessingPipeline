@@ -1,6 +1,8 @@
 ﻿using DocumentProcessingPipeline.Application.Interfaces;
+using DocumentProcessingPipeline.Core.Events;
 using DocumentProcessingPipeline.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace DocumentProcessingPipeline.API.Controllers
 {
@@ -9,13 +11,18 @@ namespace DocumentProcessingPipeline.API.Controllers
     public class DocumentsController : ControllerBase
     {
         private readonly IDocumentService _service;
+        private readonly IEventProducer _eventProducer;
         private readonly ILogger<DocumentsController> _logger;
         private const long MaxFileSize = 50 * 1024 * 1024; // 50MB
         private static readonly string[] AllowedExtensions = { ".pdf", ".png", ".jpg", ".jpeg", ".tiff" };
 
-        public DocumentsController(IDocumentService service, ILogger<DocumentsController> logger)
+        public DocumentsController(
+            IDocumentService service,
+            IEventProducer eventProducer,
+            ILogger<DocumentsController> logger)
         {
             _service = service;
+            _eventProducer = eventProducer;
             _logger = logger;
         }
 
@@ -51,7 +58,7 @@ namespace DocumentProcessingPipeline.API.Controllers
                     return BadRequest(new { error = $"File type not supported. Allowed: {string.Join(", ", AllowedExtensions)}" });
                 }
 
-                // Save file with unique name to prevent overwrites
+                // Save file
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
                 Directory.CreateDirectory(uploadsFolder);
 
@@ -66,17 +73,25 @@ namespace DocumentProcessingPipeline.API.Controllers
                 _logger.LogInformation("File uploaded successfully: {FileName}, Path: {FilePath}",
                     file.FileName, filePath);
 
-                // Process document
+                // Save document to database
                 var document = await _service.UploadAndProcessAsync(file.FileName, filePath);
 
-                _logger.LogInformation("Document processed successfully: {DocumentId}", document.Id);
+                // Publish event to Kafka for async processing
+                var processingEvent = new DocumentProcessingEvent(
+                    document.Id,
+                    document.FileName,
+                    document.FilePath);
 
-                return Ok(new
+                await _eventProducer.PublishDocumentProcessingEventAsync(processingEvent);
+
+                _logger.LogInformation("Document processing event published: {DocumentId}", document.Id);
+
+                return Accepted(new
                 {
                     documentId = document.Id,
                     fileName = document.FileName,
-                    status = document.Status.ToString(),
-                    tagCount = document.Tags.Count
+                    status = "queued",
+                    message = "Document uploaded and queued for processing"
                 });
             }
             catch (InvalidDocumentException ex)

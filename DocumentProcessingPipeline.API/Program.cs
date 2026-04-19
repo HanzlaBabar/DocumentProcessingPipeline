@@ -2,7 +2,9 @@ using DocumentProcessingPipeline.Application.Interfaces;
 using DocumentProcessingPipeline.Application.OCR;
 using DocumentProcessingPipeline.Application.Services;
 using DocumentProcessingPipeline.Infrastructure.Context;
+using DocumentProcessingPipeline.Infrastructure.Kafka;
 using DocumentProcessingPipeline.Infrastructure.Repositories;
+using DocumentProcessingPipeline.Infrastructure.Services;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -17,18 +19,18 @@ try
 
     builder.Host.UseSerilog();
 
-    // Add services to the container
+    // Add services
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
-    // Register services
+    // Core services
     builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
     builder.Services.AddScoped<IDocumentService, DocumentService>();
     builder.Services.AddScoped<OcrService>();
     builder.Services.AddScoped<ITagDetectionService, TagDetectionService>();
 
-    // Register MongoDbContext with proper error handling
+    // Database
     builder.Services.AddSingleton<MongoDbContext>(sp =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
@@ -40,15 +42,32 @@ try
         if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(dbName))
         {
             throw new InvalidOperationException(
-                "MongoDB connection string and database name must be configured in appsettings.json");
+                "MongoDB configuration is missing in appsettings.json");
         }
 
         return new MongoDbContext(connectionString, dbName, logger);
     });
 
+    // Kafka Event Bus
+    var kafkaBootstrapServers = builder.Configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
+
+    builder.Services.AddSingleton<IEventProducer>(sp =>
+    {
+        var logger = sp.GetRequiredService<ILogger<KafkaEventProducer>>();
+        return new KafkaEventProducer(kafkaBootstrapServers, logger);
+    });
+
+    builder.Services.AddSingleton<IEventConsumer>(sp =>
+    {
+        var logger = sp.GetRequiredService<ILogger<KafkaEventConsumer>>();
+        return new KafkaEventConsumer(kafkaBootstrapServers, logger);
+    });
+
+    // Background worker
+    builder.Services.AddHostedService<DocumentProcessingWorker>();
+
     var app = builder.Build();
 
-    // Configure the HTTP request pipeline
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
